@@ -1,0 +1,36 @@
+{
+    "name": "@solytics/vue-limit-widgets",
+    "version": "0.1.0",
+    "private": false,
+    "type": "module",
+    "main": "dist/vue-limit-widgets.umd.cjs",
+    "module": "dist/vue-limit-widgets.es.js",
+    "exports": {
+        ".": {
+            "import": "./dist/vue-limit-widgets.es.js",
+            "require": "./dist/vue-limit-widgets.umd.cjs"
+        }
+    },
+    "files": [
+        "dist",
+        "README.md",
+        "LICENSE"
+    ],
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview"
+    },
+    "peerDependencies": {
+        "vue": "^3.3.0 || ^3.4.0 || ^3.5.0"
+    },
+    "dependencies": {
+        "@tailwindcss/vite": "^4.1.13",
+        "tailwindcss": "^4.1.13"
+    },
+    "devDependencies": {
+        "@vitejs/plugin-vue": "^6.0.0",
+        "vite": "^7.0.4",
+        "vite-plugin-css-injected-by-js": "^3.5.2"
+    }
+}
