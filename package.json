@@ -3,12 +3,12 @@
     "version": "0.1.0",
     "private": false,
     "type": "module",
-    "main": "dist/vue-limit-widgets.umd.cjs",
+    "main": "dist/vue-limit-widgets.umd.js",
     "module": "dist/vue-limit-widgets.es.js",
     "exports": {
         ".": {
             "import": "./dist/vue-limit-widgets.es.js",
-            "require": "./dist/vue-limit-widgets.umd.cjs"
+            "require": "./dist/vue-limit-widgets.umd.js"
         }
     },
     "files": [
