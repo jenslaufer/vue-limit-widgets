@@ -1,10 +1,12 @@
 <template>
-    <slot name="withinQuota" v-if="quotaUsed <= maxQuotaRef" />
-    <slot name="exceededQuota" v-else />
+    <template v-if="loaded">
+        <slot name="withinQuota" v-if="quotaUsed <= maxQuotaRef" />
+        <slot name="exceededQuota" v-else />
+    </template>
 </template>
 <script setup>
 import { onMounted, ref, watch } from 'vue'
-import { getQuotaUsed, saveQuotaUsed, getMaxQuota, saveMaxQuota } from '../quota.js'
+import { incrementQuotaUsed, getMaxQuota, saveMaxQuota } from '../quota.js'
 
 const props = defineProps({
     quotaName: {
@@ -23,36 +25,41 @@ const props = defineProps({
 
 const quotaUsed = ref(0)
 const maxQuotaRef = ref(0)
+const loaded = ref(false)
 
-const initializeMaxQuota = async () => {
-    const savedMaxQuota = await getMaxQuota(props.maxQuotaName)
-    const maxQuota = savedMaxQuota ?? props.maxQuota
+const initializeMaxQuota = async (maxQuotaName) => {
+    const savedMaxQuota = await getMaxQuota(maxQuotaName)
+    const resolvedMaxQuota = Number(savedMaxQuota ?? props.maxQuota)
 
     if (savedMaxQuota === null) {
-        await saveMaxQuota(props.maxQuotaName, props.maxQuota)
+        await saveMaxQuota(maxQuotaName, resolvedMaxQuota)
     }
 
-    maxQuotaRef.value = maxQuota
+    maxQuotaRef.value = resolvedMaxQuota
 }
 
-const initializeQuotaUsed = async () => {
-    const currentQuotaUsed = await getQuotaUsed(props.quotaName) ?? 0
-    const newQuotaUsed = Number(currentQuotaUsed) <= maxQuotaRef.value
-        ? Number(currentQuotaUsed) + 1
-        : Number(currentQuotaUsed)
-
-    await saveQuotaUsed(props.quotaName, newQuotaUsed)
-    quotaUsed.value = newQuotaUsed
+const initializeQuotaUsed = async (quotaName) => {
+    quotaUsed.value = await incrementQuotaUsed(quotaName, maxQuotaRef.value)
 }
 
 watch(() => props.maxQuota, async (newValue) => {
-    maxQuotaRef.value = newValue
-    await saveMaxQuota(props.maxQuotaName, newValue)
+    const normalized = Number(newValue)
+    maxQuotaRef.value = normalized
+    await saveMaxQuota(props.maxQuotaName, normalized)
+})
+
+watch(() => props.maxQuotaName, async (newName) => {
+    await initializeMaxQuota(newName)
+})
+
+watch(() => props.quotaName, async (newName) => {
+    await initializeQuotaUsed(newName)
 })
 
 onMounted(async () => {
-    await initializeMaxQuota()
-    await initializeQuotaUsed()
+    await initializeMaxQuota(props.maxQuotaName)
+    await initializeQuotaUsed(props.quotaName)
+    loaded.value = true
 })
 
 </script>
