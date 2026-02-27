@@ -41,7 +41,7 @@ import { Quota } from '@solytics/vue-limit-widgets'
 
 ### `<Expiry>`
 
-Renders `withinExpiry` until the date passes, then switches to `exceededExpiry`. The expiry date is locked on first mount — passing a new value later has no effect.
+Renders `withinExpiry` until the date passes, then switches to `exceededExpiry`. Updating the `expiry` prop applies immediately and is persisted.
 
 ```vue
 <script setup>

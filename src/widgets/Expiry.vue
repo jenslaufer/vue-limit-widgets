@@ -6,7 +6,7 @@
 </template>
 <script setup>
 import { onMounted, onUnmounted, ref, watch } from 'vue'
-import { getExpiry, saveExpiry } from '../expiry.js'
+import { saveExpiry } from '../expiry.js'
 
 const props = defineProps({
     expiry: {
@@ -25,22 +25,15 @@ const loaded = ref(false)
 
 let timer = null
 
-watch(() => props.expiry, async (newValue) => {
-    expiryRef.value = new Date(newValue)
-    await saveExpiry(props.expiryName, newValue)
-})
+watch(() => [props.expiry, props.expiryName], async ([newExpiry, newName]) => {
+    expiryRef.value = new Date(newExpiry)
+    await saveExpiry(newName, newExpiry)
+}, { immediate: true })
 
-onMounted(async () => {
-    const savedExpiry = await getExpiry(props.expiryName);
-    if (savedExpiry) {
-        expiryRef.value = new Date(savedExpiry);
-    } else {
-        expiryRef.value = new Date(props.expiry);
-        await saveExpiry(props.expiryName, props.expiry);
-    }
+onMounted(() => {
     now.value = new Date()
     loaded.value = true
-    timer = setInterval(() => { now.value = new Date() }, 3_600_000)
+    timer = setInterval(() => { now.value = new Date() }, 60_000)
 })
 
 onUnmounted(() => {
