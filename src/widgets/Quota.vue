@@ -1,6 +1,8 @@
 <template>
-    <slot name="withinQuota" v-if="quotaUsed <= maxQuotaRef" />
-    <slot name="exceededQuota" v-else />
+    <template v-if="loaded">
+        <slot name="withinQuota" v-if="quotaUsed <= maxQuotaRef" />
+        <slot name="exceededQuota" v-else />
+    </template>
 </template>
 <script setup>
 import { onMounted, ref, watch } from 'vue'
@@ -23,6 +25,7 @@ const props = defineProps({
 
 const quotaUsed = ref(0)
 const maxQuotaRef = ref(0)
+const loaded = ref(false)
 
 const initializeMaxQuota = async () => {
     const savedMaxQuota = await getMaxQuota(props.maxQuotaName)
@@ -53,6 +56,7 @@ watch(() => props.maxQuota, async (newValue) => {
 onMounted(async () => {
     await initializeMaxQuota()
     await initializeQuotaUsed()
+    loaded.value = true
 })
 
 </script>
